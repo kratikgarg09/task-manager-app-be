@@ -1,0 +1,62 @@
+package com.kratik.task_manager.controller;
+
+import com.kratik.task_manager.dto.TaskDto;
+import com.kratik.task_manager.dto.TaskResponseDTO;
+import com.kratik.task_manager.model.TasksEntity;
+import com.kratik.task_manager.services.TaskService;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/tasks")
+public class TaskController {
+
+    private final TaskService taskService;
+
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    @PostMapping("/create")
+    public TaskResponseDTO create(@RequestBody @Valid TaskDto taskDto) {
+        return taskService.createTask(taskDto);
+    }
+
+    @GetMapping("/get-all")
+    public List<TaskResponseDTO> getAll() {
+        return taskService.getTasksForCurrentUser();
+    }
+
+    @PutMapping("/{id}")
+    public TaskResponseDTO update(@PathVariable Long id, @RequestBody @Valid TaskDto taskDto) {
+        return taskService.updateTask(id, taskDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        taskService.deleteTask(id);
+    }
+
+
+    @GetMapping("/today")
+    public List<TasksEntity> todayTasks() {
+        return taskService.getTodayTasks();
+    }
+
+    @GetMapping("/completed")
+    public List<TasksEntity> completedTasks(@RequestParam boolean status) {
+        return taskService.getCompletedTasks(status);
+    }
+
+    @GetMapping("/upcoming")
+    public List<TasksEntity> upcomingTasks() {
+        return taskService.getUpcomingTasks();
+    }
+
+    @GetMapping("/search")
+    public List<TasksEntity> search(@RequestParam String keyword) {
+        return taskService.searchTasks(keyword);
+    }
+}

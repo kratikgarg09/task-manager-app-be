@@ -2,7 +2,7 @@ package com.kratik.task_manager.controller;
 
 import com.kratik.task_manager.dto.TaskDto;
 import com.kratik.task_manager.dto.TaskResponseDTO;
-import com.kratik.task_manager.model.TasksEntity;
+import com.kratik.task_manager.model.Priority;
 import com.kratik.task_manager.services.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -41,22 +41,27 @@ public class TaskController {
 
 
     @GetMapping("/today")
-    public List<TasksEntity> todayTasks() {
+    public List<TaskResponseDTO> todayTasks() {
         return taskService.getTodayTasks();
     }
 
     @GetMapping("/completed")
-    public List<TasksEntity> completedTasks(@RequestParam boolean status) {
+    public List<TaskResponseDTO> completedTasks(@RequestParam boolean status) {
         return taskService.getCompletedTasks(status);
     }
 
     @GetMapping("/upcoming")
-    public List<TasksEntity> upcomingTasks() {
+    public List<TaskResponseDTO> upcomingTasks() {
         return taskService.getUpcomingTasks();
     }
 
     @GetMapping("/search")
-    public List<TasksEntity> search(@RequestParam String keyword) {
+    public List<TaskResponseDTO> search(@RequestParam String keyword) {
         return taskService.searchTasks(keyword);
+    }
+
+    @GetMapping("/priority")
+    public List<TaskResponseDTO> getByPriority(@RequestParam Priority level) {
+        return taskService.getByPriority(level);
     }
 }

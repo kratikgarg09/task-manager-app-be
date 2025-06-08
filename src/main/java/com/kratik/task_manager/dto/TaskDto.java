@@ -1,11 +1,13 @@
 package com.kratik.task_manager.dto;
 
+import com.kratik.task_manager.model.Priority;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class TaskDto {
@@ -18,5 +20,10 @@ public class TaskDto {
     @NotNull(message = "Due date cannot be null")
     @Future(message = "Due date must be in the future")
     private LocalDate dueDate;
+
+    @NotNull(message = "Priority is required")
+    private Priority priority;
+
+    private LocalDateTime reminderTime;
     private boolean completed;
 }

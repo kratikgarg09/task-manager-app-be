@@ -3,6 +3,7 @@ package com.kratik.task_manager.services;
 import com.kratik.task_manager.dto.TaskDto;
 import com.kratik.task_manager.dto.TaskResponseDTO;
 import com.kratik.task_manager.dto.UserDTO;
+import com.kratik.task_manager.model.Priority;
 import com.kratik.task_manager.model.TasksEntity;
 import com.kratik.task_manager.model.UserEntity;
 import com.kratik.task_manager.repository.TaskRepository;
@@ -42,11 +43,13 @@ public class TaskService {
                 .dueDate(taskDto.getDueDate())
                 .completed(taskDto.isCompleted())
                 .user(getCurrentUser())
+                .priority(taskDto.getPriority())
+                .reminderTime(taskDto.getReminderTime())
                 .build();
 
         TasksEntity savedTask = taskRepository.save(task);
 
-        return commonFunctions.getTaskResponseDto(savedTask,getCurrentUser());
+        return commonFunctions.getTaskResponseDto(savedTask);
     }
 
     public List<TaskResponseDTO> getTasksForCurrentUser() {
@@ -55,7 +58,7 @@ public class TaskService {
 
         List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
         for (TasksEntity tasks : tasksEntities){
-            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks,getCurrentUser()));
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
         }
         return taskResponseDTOS;
     }
@@ -82,23 +85,52 @@ public class TaskService {
         task.setCompleted(taskDto.isCompleted());
         taskRepository.save(task);
 
-        return commonFunctions.getTaskResponseDto(task,getCurrentUser());
+        return commonFunctions.getTaskResponseDto(task);
     }
 
 
-    public List<TasksEntity> getTodayTasks() {
-        return taskRepository.findByUserAndDueDate(getCurrentUser(), LocalDate.now());
+    public List<TaskResponseDTO> getTodayTasks() {
+        List<TasksEntity> tasksEntities = taskRepository.findByUserAndDueDate(getCurrentUser(), LocalDate.now());
+        List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
+        for (TasksEntity tasks : tasksEntities){
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
+        }
+        return taskResponseDTOS;
     }
 
-    public List<TasksEntity> getCompletedTasks(boolean completed) {
-        return taskRepository.findByUserAndCompleted(getCurrentUser(), completed);
+    public List<TaskResponseDTO> getCompletedTasks(boolean completed) {
+        List<TasksEntity> tasksEntities = taskRepository.findByUserAndCompleted(getCurrentUser(), completed);
+        List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
+        for (TasksEntity tasks : tasksEntities){
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
+        }
+        return taskResponseDTOS;
     }
 
-    public List<TasksEntity> getUpcomingTasks() {
-        return taskRepository.findByUserAndDueDateAfter(getCurrentUser(), LocalDate.now());
+    public List<TaskResponseDTO> getUpcomingTasks() {
+        List<TasksEntity> tasksEntities =  taskRepository.findByUserAndDueDateAfter(getCurrentUser(), LocalDate.now());
+        List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
+        for (TasksEntity tasks : tasksEntities){
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
+        }
+        return taskResponseDTOS;
     }
 
-    public List<TasksEntity> searchTasks(String keyword) {
-        return taskRepository.findByUserAndTitleContainingIgnoreCase(getCurrentUser(), keyword);
+    public List<TaskResponseDTO> searchTasks(String keyword) {
+        List<TasksEntity> tasksEntities =  taskRepository.findByUserAndTitleContainingIgnoreCase(getCurrentUser(), keyword);
+        List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
+        for (TasksEntity tasks : tasksEntities){
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
+        }
+        return taskResponseDTOS;
+    }
+
+    public List<TaskResponseDTO> getByPriority(Priority priority) {
+        List<TasksEntity> tasksEntities =  taskRepository.findByUserAndPriority(getCurrentUser(), priority);
+        List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
+        for (TasksEntity tasks : tasksEntities){
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
+        }
+        return taskResponseDTOS;
     }
 }

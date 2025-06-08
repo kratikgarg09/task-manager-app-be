@@ -24,4 +24,7 @@ public interface TaskRepository extends JpaRepository<TasksEntity, Long> {
     List<TasksEntity> findByReminderTime(LocalDateTime time);
 
     List<TasksEntity> findByReminderTimeAndReminderSentFalse(LocalDateTime time);
+
+    List<TasksEntity> findByReminderTimeBetweenAndReminderSent(LocalDateTime start, LocalDateTime end,boolean sent);
+
 }

@@ -7,13 +7,12 @@ import com.kratik.task_manager.model.TasksEntity;
 import com.kratik.task_manager.model.UserEntity;
 import com.kratik.task_manager.repository.TaskRepository;
 import com.kratik.task_manager.repository.UserRepository;
+import com.kratik.task_manager.utility.CommonFunctions;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,9 +21,12 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    private final CommonFunctions commonFunctions;
+
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, CommonFunctions commonFunctions) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.commonFunctions = commonFunctions;
     }
 
     private UserEntity getCurrentUser() {
@@ -34,46 +36,30 @@ public class TaskService {
     }
 
     public TaskResponseDTO createTask(TaskDto taskDto) {
-        UserEntity user = getCurrentUser();
-
         TasksEntity task = TasksEntity.builder()
                 .title(taskDto.getTitle())
                 .description(taskDto.getDescription())
                 .dueDate(taskDto.getDueDate())
                 .completed(taskDto.isCompleted())
-                .user(user)
+                .user(getCurrentUser())
                 .build();
 
         TasksEntity savedTask = taskRepository.save(task);
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getName(),
-                user.getEmailId(),
-                user.getMobileNumber()
-        );
+
         return new TaskResponseDTO(
                 savedTask.getId(),
                 savedTask.getTitle(),
                 savedTask.getDescription(),
                 savedTask.getDueDate(),
                 savedTask.isCompleted(),
-                userDTO
+                commonFunctions.getUserDtoByUser(getCurrentUser())
         );
     }
 
     public List<TaskResponseDTO> getTasksForCurrentUser() {
-        UserEntity user = getCurrentUser();
 
-        List<TasksEntity> tasksEntities = taskRepository.findByUser(user);
+        List<TasksEntity> tasksEntities = taskRepository.findByUser(getCurrentUser());
 
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getName(),
-                user.getEmailId(),
-                user.getMobileNumber()
-        );
 
         List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
         for (TasksEntity tasks : tasksEntities){
@@ -83,7 +69,7 @@ public class TaskService {
                     tasks.getDescription(),
                     tasks.getDueDate(),
                     tasks.isCompleted(),
-                    userDTO
+                    commonFunctions.getUserDtoByUser(getCurrentUser())
             );
             taskResponseDTOS.add(taskResponseDTO);
         }
@@ -112,21 +98,13 @@ public class TaskService {
         task.setCompleted(taskDto.isCompleted());
         taskRepository.save(task);
 
-        UserEntity user = getCurrentUser();
-
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getName(),
-                user.getEmailId(),
-                user.getMobileNumber()
-        );
         return new TaskResponseDTO( task.getId(),
                 task.getTitle(),
                 task.getDescription(),
                 task.getDueDate(),
                 task.isCompleted(),
-                userDTO);
+                commonFunctions.getUserDtoByUser(getCurrentUser())
+        );
     }
 
 

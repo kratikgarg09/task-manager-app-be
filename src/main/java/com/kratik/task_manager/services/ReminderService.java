@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,20 +18,31 @@ import java.util.List;
 public class ReminderService {
 
     private final TaskRepository taskRepository;
+    private final EmailService emailService;
 
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void checkReminders() {
-        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
-        List<TasksEntity> dueReminders = taskRepository.findByReminderTimeAndReminderSentFalse(now);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime windowStart = now.minusMinutes(1); // avoid missing in case of small delays
+        LocalDateTime windowEnd = now.plusMinutes(2);
+        List<TasksEntity> dueReminders = taskRepository.findByReminderTimeBetweenAndReminderSent(windowStart,
+                windowEnd,false);
 
+        log.info("⏰ Checking tasks between {} and {}", windowStart, windowEnd);
+//        log.info("📬 Sending reminder for task ID {}", dueReminders.getFirst().getId());
         for (TasksEntity task : dueReminders) {
-            UserEntity user = task.getUser(); // This makes it user-specific
+            UserEntity user = task.getUser();
+            String subject = "🔔 Task Reminder: " + task.getTitle();
+            String body = "Hi " + user.getName() + ",\n\n"
+                    + "This is a reminder for your task:\n\n"
+                    + "📌 Title: " + task.getTitle() + "\n"
+                    + "📅 Due: " + task.getDueDate() + "\n\n"
+                    + "Stay productive!\nYour Task Manager";
 
-            // 🔔 You can trigger: email, push, or logging
-            log.info("🔔 Reminder for user {}: '{}' is due at {}", user.getEmailId(), task.getTitle(),
-                    task.getReminderTime());
+            emailService.sendReminderEmail(user.getEmailId(), subject, body);
+            log.info("mail sent");
 
-            // Mark it as sent
             task.setReminderSent(true);
             taskRepository.save(task);
         }

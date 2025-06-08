@@ -6,8 +6,8 @@ spring:
     name: Task Manager
   datasource:
     url: jdbc:postgresql://localhost:5432/taskdb
-    username: kratik_super_user
-    password: Qwerty@0902
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -21,8 +21,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: gargkratik083@gmail.com
-    password: lsycvjhdrguuuvpj
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:

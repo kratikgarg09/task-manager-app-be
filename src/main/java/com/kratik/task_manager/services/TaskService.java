@@ -46,32 +46,16 @@ public class TaskService {
 
         TasksEntity savedTask = taskRepository.save(task);
 
-        return new TaskResponseDTO(
-                savedTask.getId(),
-                savedTask.getTitle(),
-                savedTask.getDescription(),
-                savedTask.getDueDate(),
-                savedTask.isCompleted(),
-                commonFunctions.getUserDtoByUser(getCurrentUser())
-        );
+        return commonFunctions.getTaskResponseDto(savedTask,getCurrentUser());
     }
 
     public List<TaskResponseDTO> getTasksForCurrentUser() {
 
         List<TasksEntity> tasksEntities = taskRepository.findByUser(getCurrentUser());
 
-
         List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
         for (TasksEntity tasks : tasksEntities){
-            TaskResponseDTO taskResponseDTO = new TaskResponseDTO(
-                    tasks.getId(),
-                    tasks.getTitle(),
-                    tasks.getDescription(),
-                    tasks.getDueDate(),
-                    tasks.isCompleted(),
-                    commonFunctions.getUserDtoByUser(getCurrentUser())
-            );
-            taskResponseDTOS.add(taskResponseDTO);
+            taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks,getCurrentUser()));
         }
         return taskResponseDTOS;
     }
@@ -98,13 +82,7 @@ public class TaskService {
         task.setCompleted(taskDto.isCompleted());
         taskRepository.save(task);
 
-        return new TaskResponseDTO( task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getDueDate(),
-                task.isCompleted(),
-                commonFunctions.getUserDtoByUser(getCurrentUser())
-        );
+        return commonFunctions.getTaskResponseDto(task,getCurrentUser());
     }
 
 

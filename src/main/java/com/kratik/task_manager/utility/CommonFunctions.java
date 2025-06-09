@@ -43,6 +43,7 @@ public class CommonFunctions {
                 tasks.getPriority(),
                 tasks.isCompleted(),
                 tasks.getReminderTime(),
+                tasks.getStatus(),
                 getUserDtoByUser()
         );
     }

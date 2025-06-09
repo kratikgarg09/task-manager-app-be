@@ -2,10 +2,9 @@ package com.kratik.task_manager.services;
 
 import com.kratik.task_manager.dto.TaskDto;
 import com.kratik.task_manager.dto.TaskResponseDTO;
-import com.kratik.task_manager.dto.UserDTO;
-import com.kratik.task_manager.model.Priority;
-import com.kratik.task_manager.model.TasksEntity;
-import com.kratik.task_manager.model.UserEntity;
+import com.kratik.task_manager.model.*;
+import com.kratik.task_manager.repository.CategoryRepository;
+import com.kratik.task_manager.repository.TagRepository;
 import com.kratik.task_manager.repository.TaskRepository;
 import com.kratik.task_manager.repository.UserRepository;
 import com.kratik.task_manager.utility.CommonFunctions;
@@ -14,7 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TaskService {
@@ -23,11 +24,15 @@ public class TaskService {
     private final UserRepository userRepository;
 
     private final CommonFunctions commonFunctions;
+    private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, CommonFunctions commonFunctions) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, CommonFunctions commonFunctions, TagRepository tagRepository, CategoryRepository categoryRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.commonFunctions = commonFunctions;
+        this.tagRepository = tagRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     private UserEntity getCurrentUser() {
@@ -37,6 +42,7 @@ public class TaskService {
     }
 
     public TaskResponseDTO createTask(TaskDto taskDto) {
+
         TasksEntity task = TasksEntity.builder()
                 .title(taskDto.getTitle())
                 .description(taskDto.getDescription())
@@ -46,6 +52,18 @@ public class TaskService {
                 .priority(taskDto.getPriority())
                 .reminderTime(taskDto.getReminderTime())
                 .build();
+
+        CategoryEntity category = categoryRepository.findById(taskDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        Set<TagsEntity> tags = new HashSet<>();
+        for (Long tagId : taskDto.getTagIds()) {
+            TagsEntity tag = tagRepository.findById(tagId)
+                    .orElseThrow(() -> new RuntimeException("Tag not found: " + tagId));
+            tags.add(tag);
+        }
+        task.setCategory(category);
+        task.setTags(tags);
 
         TasksEntity savedTask = taskRepository.save(task);
 

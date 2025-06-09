@@ -1,6 +1,7 @@
 package com.kratik.task_manager.dto;
 
 import com.kratik.task_manager.model.Priority;
+import com.kratik.task_manager.model.TaskStatus;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 public class TaskDto {
@@ -26,4 +28,10 @@ public class TaskDto {
 
     private LocalDateTime reminderTime;
     private boolean completed;
+
+    private TaskStatus status;
+
+    private Long categoryId;  // for assigning category by id
+    private Set<Long> tagIds;
+
 }

@@ -2,10 +2,12 @@ package com.kratik.task_manager.controller;
 
 import com.kratik.task_manager.services.ReminderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin(origins = "http://localhost:5000")
 @RestController
 @RequiredArgsConstructor
 public class TestController {

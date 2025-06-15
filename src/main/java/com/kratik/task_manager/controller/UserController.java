@@ -6,6 +6,7 @@ import com.kratik.task_manager.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5000")
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor

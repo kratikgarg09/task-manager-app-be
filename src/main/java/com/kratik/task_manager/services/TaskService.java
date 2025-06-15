@@ -53,16 +53,24 @@ public class TaskService {
                 .reminderTime(taskDto.getReminderTime())
                 .build();
 
-        CategoryEntity category = categoryRepository.findById(taskDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+        if(taskDto.getCategoryId()!= null && taskDto.getTagIds()!=null){
+            CategoryEntity category = categoryRepository.findById(taskDto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        Set<TagsEntity> tags = new HashSet<>();
-        for (Long tagId : taskDto.getTagIds()) {
-            TagsEntity tag = tagRepository.findById(tagId)
-                    .orElseThrow(() -> new RuntimeException("Tag not found: " + tagId));
-            tags.add(tag);
+            Set<TagsEntity> tags = new HashSet<>();
+            for (Long tagId : taskDto.getTagIds()) {
+                TagsEntity tag = tagRepository.findById(tagId)
+                        .orElseThrow(() -> new RuntimeException("Tag not found: " + tagId));
+                tags.add(tag);
+            }
+            task.setCategory(category);
+            task.setTags(tags);
         }
-        task.setCategory(category);
+        CategoryEntity ct = CategoryEntity.builder().id(1L).name("testCat").build();
+        TagsEntity tg = TagsEntity.builder().id(1L).name("tastTag").build();
+        Set<TagsEntity> tags = new HashSet<>();
+        tags.add(tg);
+        task.setCategory(ct);
         task.setTags(tags);
 
         TasksEntity savedTask = taskRepository.save(task);
@@ -100,6 +108,9 @@ public class TaskService {
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
         task.setDueDate(taskDto.getDueDate());
+        task.setPriority(taskDto.getPriority());
+        task.setReminderTime(taskDto.getReminderTime());
+        task.setStatus(taskDto.getStatus());
         task.setCompleted(taskDto.isCompleted());
         taskRepository.save(task);
 
@@ -150,5 +161,12 @@ public class TaskService {
             taskResponseDTOS.add(commonFunctions.getTaskResponseDto(tasks));
         }
         return taskResponseDTOS;
+    }
+
+    public TaskResponseDTO getTask(Long id) {
+        TasksEntity task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("TasksEntity not found"));
+
+        return commonFunctions.getTaskResponseDto(task);
     }
 }

@@ -7,8 +7,10 @@ import com.kratik.task_manager.services.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PublicKey;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5000")
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -63,5 +65,10 @@ public class TaskController {
     @GetMapping("/priority")
     public List<TaskResponseDTO> getByPriority(@RequestParam Priority level) {
         return taskService.getByPriority(level);
+    }
+
+    @GetMapping("/{id}")
+    public TaskResponseDTO getTask(@PathVariable Long id){
+        return taskService.getTask(id);
     }
 }

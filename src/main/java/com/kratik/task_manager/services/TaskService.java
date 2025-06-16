@@ -51,6 +51,7 @@ public class TaskService {
                 .user(getCurrentUser())
                 .priority(taskDto.getPriority())
                 .reminderTime(taskDto.getReminderTime())
+                .status(taskDto.getStatus())
                 .build();
 
         if(taskDto.getCategoryId()!= null && taskDto.getTagIds()!=null){

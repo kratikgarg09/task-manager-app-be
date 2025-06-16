@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.PublicKey;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5000")
+
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {

@@ -4,6 +4,7 @@ import com.kratik.task_manager.model.Priority;
 import com.kratik.task_manager.model.TasksEntity;
 import com.kratik.task_manager.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TaskRepository extends JpaRepository<TasksEntity, Long> {
+public interface TaskRepository extends JpaRepository<TasksEntity, Long>, JpaSpecificationExecutor<TasksEntity> {
     List<TasksEntity> findByUser(UserEntity user);
     List<TasksEntity> findByUserAndCompleted(UserEntity user, boolean completed);
 

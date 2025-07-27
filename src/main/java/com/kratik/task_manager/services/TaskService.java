@@ -9,13 +9,12 @@ import com.kratik.task_manager.repository.TaskRepository;
 import com.kratik.task_manager.repository.UserRepository;
 import com.kratik.task_manager.utility.CommonFunctions;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TaskService {
@@ -169,5 +168,22 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException("TasksEntity not found"));
 
         return commonFunctions.getTaskResponseDto(task);
+    }
+
+    public List<TaskResponseDTO> searchTasksByParameter( String title, String status, String category, String tag,
+                                                  LocalDate fromDate, LocalDate toDate) {
+        UserEntity user = commonFunctions.getCurrentUser();
+
+        List<TasksEntity> tasksEntities = taskRepository.findAll(TaskSpecification.filterTasks(
+                user,title, status, category, tag, fromDate, toDate
+        ));
+        List<TaskResponseDTO> taskResponseDTOS = new ArrayList<>();
+
+        for (TasksEntity tasks : tasksEntities){
+            TaskResponseDTO taskResponseDTO = commonFunctions.getTaskResponseDto(tasks);
+            taskResponseDTOS.add(taskResponseDTO);
+        }
+
+        return taskResponseDTOS;
     }
 }

@@ -1,5 +1,6 @@
 package com.kratik.task_manager.controller;
 
+import com.kratik.task_manager.dto.UpdatePasswordDTO;
 import com.kratik.task_manager.dto.UserDTO;
 import com.kratik.task_manager.dto.UserUpdateDTO;
 import com.kratik.task_manager.services.UserService;
@@ -20,8 +21,13 @@ public class UserController {
     }
 
     @PutMapping("/update/profile")
-    public UserDTO updateProfile(@RequestBody UserUpdateDTO userUpdateDTO){
+    public UserDTO updateProfile(@RequestBody UserUpdateDTO userUpdateDTO) {
         return userService.updateUserProfile(userUpdateDTO);
+    }
+
+    @PutMapping("/change-password")
+    public UserDTO updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO ){
+        return userService.updatePassword(updatePasswordDTO);
     }
 
 }

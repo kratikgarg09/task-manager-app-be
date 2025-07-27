@@ -3,12 +3,19 @@ package com.kratik.task_manager.controller;
 import com.kratik.task_manager.dto.TaskDto;
 import com.kratik.task_manager.dto.TaskResponseDTO;
 import com.kratik.task_manager.model.Priority;
+import com.kratik.task_manager.model.TasksEntity;
 import com.kratik.task_manager.services.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.PublicKey;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -70,5 +77,33 @@ public class TaskController {
     @GetMapping("/{id}")
     public TaskResponseDTO getTask(@PathVariable Long id){
         return taskService.getTask(id);
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> getDashboardData() {
+        Map<String, Object> data = new HashMap<>();
+        List<TaskResponseDTO> tasks = taskService.getTasksForCurrentUser();
+
+        data.put("total", tasks.size());
+        data.put("completed", tasks.stream().filter(t -> t.getStatus().equals("COMPLETED")).count());
+        data.put("pending", tasks.stream().filter(t -> t.getStatus().equals("PENDING")).count());
+        data.put("overdue", tasks.stream().filter(t -> t.getDueDate().isBefore(LocalDate.now())).count());
+        data.put("dueToday", tasks.stream().filter(t -> t.getDueDate().isEqual(LocalDate.now())).count());
+
+        return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/search-task-filter")
+    public ResponseEntity<List<TaskResponseDTO>> searchTasks(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
+    ) {
+        List<TaskResponseDTO> results = taskService.searchTasksByParameter( title, status, category, tag, fromDate,
+                toDate);
+        return ResponseEntity.ok(results);
     }
 }
